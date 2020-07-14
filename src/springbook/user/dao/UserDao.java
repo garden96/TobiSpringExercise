@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 
 import springbook.user.domain.User;
 
-import javax.sql.DataSource;
 
 public class UserDao {
     private DataSource dataSource;
@@ -16,10 +16,7 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
-    public UserDao() {
-    }
-
-    public void add(User user) throws ClassNotFoundException, SQLException {
+    public void add(User user) throws SQLException {
         Connection c = this.dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement(
@@ -34,10 +31,10 @@ public class UserDao {
         c.close();
     }
 
-    public User get(String id) throws ClassNotFoundException, SQLException {
+    public User get(String id) throws SQLException {
         Connection c = this.dataSource.getConnection();
-
-        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+        PreparedStatement ps = c
+                .prepareStatement("select * from users where id = ?");
         ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
@@ -53,7 +50,4 @@ public class UserDao {
 
         return user;
     }
-
-
-
 }
