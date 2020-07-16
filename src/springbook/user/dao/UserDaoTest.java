@@ -2,33 +2,44 @@ package springbook.user.dao;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import springbook.user.domain.User;
 
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="/applicationContext.xml")
 public class UserDaoTest {
+	@Autowired
+	ApplicationContext context;
+
 	private UserDao dao; 
 	
 	private User user1;
 	private User user2;
 	private User user3;
+    private User user4;
 
 	@Before
 	public void setUp() {
-		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 		
-		this.dao = context.getBean("userDao", UserDao.class);
+		this.dao = this.context.getBean("userDao", UserDao.class);
 		
 		this.user1 = new User("nathan", "안정원", "father");
-		this.user2 = new User("jane", "안재인", "daughter");
-        this.user3 = new User("junu", "안준우", "son");
+		this.user2 = new User("sunny", "현선", "mother");
+		this.user3 = new User("jane", "안재인", "daughter");
+        this.user4 = new User("junu", "안준우", "son");
 	}
 	
 	@Test
