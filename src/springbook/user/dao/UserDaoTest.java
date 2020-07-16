@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import java.sql.SQLException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -13,18 +14,28 @@ import springbook.user.domain.User;
 
 
 public class UserDaoTest {
-	@Test 
-	public void addAndGet() throws SQLException {
+	private UserDao dao; 
+	
+	private User user1;
+	private User user2;
+	private User user3;
+
+	@Before
+	public void setUp() {
 		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-
-        UserDao dao = context.getBean("userDao", UserDao.class);
-
-        User user1 = new User("nathan", "안정원", "father");
-        User user2 = new User("sun", "현선", "mother");
+		
+		this.dao = context.getBean("userDao", UserDao.class);
+		
+		this.user1 = new User("nathan", "안정원", "father");
+		this.user2 = new User("jane", "안재인", "daughter");
+        this.user3 = new User("junu", "안준우", "son");
+	}
+	
+	@Test
+	public void addAndGet() throws SQLException {
 
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
-
 
 		dao.add(user1);
 		dao.add(user2);
@@ -41,9 +52,6 @@ public class UserDaoTest {
 
     @Test(expected=EmptyResultDataAccessException.class)
     public void getUserFailure() throws SQLException {
-        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-
-        UserDao dao = context.getBean("userDao", UserDao.class);
 
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
@@ -53,12 +61,6 @@ public class UserDaoTest {
 
 	@Test
 	public void count() throws SQLException {
-		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-
-		UserDao dao = context.getBean("userDao", UserDao.class);
-		User user1 = new User("nathan", "안정원", "father");
-		User user2 = new User("jane", "안재인", "daughter");
-        User user3 = new User("junu", "안준우", "son");
 
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
