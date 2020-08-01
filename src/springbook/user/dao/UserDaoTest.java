@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
