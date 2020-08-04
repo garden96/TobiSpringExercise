@@ -14,7 +14,7 @@ public class CalcSumTest {
 
     @Before public void setUp() {
         this.calculator = new Calculator();
-        this.numFilepath = getClass().getResource("number.txt").getPath();
+		this.numFilepath = getClass().getResource("numbers.txt").getPath();
     }
 
     @Test public void sumOfNumbers() throws IOException {
@@ -22,7 +22,7 @@ public class CalcSumTest {
 	}
 
     @Test public void multiplyOfNumbers() throws IOException {
-        assertThat(calculator.calcMultiply(this.numFilepath), is(10));
+		assertThat(calculator.calcMultiply(this.numFilepath), is(24));
     }
 
 }
