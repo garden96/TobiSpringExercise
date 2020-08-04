@@ -1,6 +1,5 @@
 package springbook.learningtest.template;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -24,6 +23,15 @@ public class Calculator {
             }
         };
         return lineReadTemplate(filepath, multiplyCallback, 1);
+    }
+
+    public String concatenate(String filepath) throws IOException {
+        LineCallback<String> concatenateCallback = new LineCallback<String>() {
+            public String doSomethingWithLine(String line, String value) {
+                return value + line;
+            }
+        };
+        return lineReadTemplate(filepath, concatenateCallback, "");
     }
 
 	public <T> T lineReadTemplate(String filepath, LineCallback<T> callback, T initVal) throws IOException {
