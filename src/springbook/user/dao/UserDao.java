@@ -1,8 +1,10 @@
 package springbook.user.dao;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import springbook.user.domain.User;
 
 import javax.sql.DataSource;
@@ -59,20 +61,20 @@ public class UserDao {
         this.jdbcTemplate.update("delete from users");
 	}
 
-	public int getCount() throws SQLException  {
-
-		Connection c = dataSource.getConnection();
-		PreparedStatement ps = c.prepareStatement("select count(*) from users");
-
-		ResultSet rs = ps.executeQuery();
-        rs.next();
-
-		int count = rs.getInt(1);
-
-        rs.close();
-        ps.close();
-        c.close();
-	
-        return count;
+	public int getCount() {
+        return this.jdbcTemplate.query(
+                new PreparedStatementCreator() {
+                    public PreparedStatement createPreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement("select count(*) from users");
+                    }
+                },
+                new ResultSetExtractor<Integer>() {
+                    public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                        rs.next();
+                        return rs.getInt(1);
+                    }
+                }
+        );
     }
+
 }
