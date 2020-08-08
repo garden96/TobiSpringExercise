@@ -25,17 +25,8 @@ public class UserDao {
 
 	public void add(final User user) {
         this.jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    public PreparedStatement createPreparedStatement(Connection c) throws SQLException {
-                        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-
-                        ps.setString(1, user.getId());
-                        ps.setString(2, user.getName());
-                        ps.setString(3, user.getPassword());
-
-                        return ps;
-                    }
-                }
+                "insert into users(id, name, password) values(?,?,?)",
+                user.getId(), user.getName(), user.getPassword()
         );
     }
 
@@ -65,13 +56,7 @@ public class UserDao {
     }
 
 	public void deleteAll() {
-        this.jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    public PreparedStatement createPreparedStatement(Connection c) throws SQLException {
-                        return c.prepareStatement("delete from users");
-                    }
-                }
-        );
+        this.jdbcTemplate.update("delete from users");
 	}
 
 	public int getCount() throws SQLException  {
