@@ -1,41 +1,42 @@
 package springbook.user.dao;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import springbook.user.domain.User;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-
-import org.springframework.dao.EmptyResultDataAccessException;
-import springbook.user.domain.User;
 
 
 public class UserDao {
+
     private DataSource dataSource;
+    private JdbcTemplate jdbcTemplate;
 
     public void setDataSource(DataSource dataSource) {
-		this.jdbcContext = new JdbcContext();
-		this.jdbcContext.setDataSource(dataSource);
         this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-	private JdbcContext jdbcContext;
-	
 
-	public void add(final User user) throws SQLException {
-		this.jdbcContext.workWithStatementStrategy(
-			new StatementStrategy() {
-				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                    PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+	public void add(final User user) {
+        this.jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    public PreparedStatement createPreparedStatement(Connection c) throws SQLException {
+                        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
 
-                    ps.setString(1, user.getId());
-                    ps.setString(2, user.getName());
-                    ps.setString(3, user.getPassword());
+                        ps.setString(1, user.getId());
+                        ps.setString(2, user.getName());
+                        ps.setString(3, user.getPassword());
 
-                    return ps;
+                        return ps;
+                    }
                 }
-            }
-		);
+        );
     }
 
 
@@ -63,8 +64,14 @@ public class UserDao {
         return user;
     }
 
-	public void deleteAll() throws SQLException {
-		this.jdbcContext.executeSql("delete from users");
+	public void deleteAll() {
+        this.jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    public PreparedStatement createPreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement("delete from users");
+                    }
+                }
+        );
 	}
 
 	public int getCount() throws SQLException  {
