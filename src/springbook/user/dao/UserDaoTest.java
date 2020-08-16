@@ -4,13 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.domain.User;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -19,12 +18,10 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
-@DirtiesContext
 public class UserDaoTest {
-	@Autowired
-	ApplicationContext context;
 
-	private UserDao dao; 
+	@Autowired UserDao dao; 
+	@Autowired DataSource dataSource;
 	
 	private User user1;
 	private User user2;
@@ -33,9 +30,6 @@ public class UserDaoTest {
 
 	@Before
 	public void setUp() {
-		
-		this.dao = this.context.getBean("userDao", UserDao.class);
-		
 		this.user1 = new User("nathan", "안정원", "father");
 		this.user2 = new User("sunny", "현선", "mother");
 		this.user3 = new User("jane", "안재인", "daughter");
