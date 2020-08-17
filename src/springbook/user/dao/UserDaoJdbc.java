@@ -35,37 +35,46 @@ public class UserDaoJdbc implements UserDao {
     }
 
 
-	public void add(final User user) {
+    public void add(final User user) {
         this.jdbcTemplate.update(
                 "insert into users(id, name, password, level, login, recommend) " +
-                "values(?,?,?,?,?,?)",
+                        "values(?,?,?,?,?,?)",
                 user.getId(), user.getName(), user.getPassword(),
                 user.getLevel().intValue(), user.getLogin(), user.getRecommend()
         );
     }
 
 
-	public User get(String id) {
-		return this.jdbcTemplate.queryForObject(
-		        "select * from users where id = ?",
-                new Object[] {id},
+    public User get(String id) {
+        return this.jdbcTemplate.queryForObject(
+                "select * from users where id = ?",
+                new Object[]{id},
                 this.userMapper
-		);
+        );
     }
 
-	public void deleteAll() {
+    public void deleteAll() {
         this.jdbcTemplate.update("delete from users");
-	}
+    }
 
-	public int getCount() {
+    public int getCount() {
         return this.jdbcTemplate.queryForInt("select count(*) from users");
     }
 
-	public List<User> getAll() {
+    public List<User> getAll() {
         return this.jdbcTemplate.query(
                 "select * from users order by id",
                 this.userMapper
         );
-	}
+    }
 
+    public void update(User user) {
+        this.jdbcTemplate.update(
+            "update users set name = ?, password = ?, level = ?, login = ?, "+
+            "recommend = ? where id = ? ",
+            user.getName(), user.getPassword(),
+                user.getLevel().intValue(), user.getLogin(),
+                user.getRecommend(),
+				user.getId());
+    }
 }
