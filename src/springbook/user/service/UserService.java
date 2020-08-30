@@ -1,13 +1,12 @@
 package springbook.user.service;
 
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.List;
 
 
@@ -17,20 +16,18 @@ public class UserService {
 
 	private UserDao userDao;
 
+	private PlatformTransactionManager transactionManager;
+
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
 	}
 
-	private DataSource dataSource;  			
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
 	}
 
-	public void upgradeLevels() throws Exception {
-		TransactionSynchronizationManager.initSynchronization();  
-		Connection c = DataSourceUtils.getConnection(dataSource); 
-		c.setAutoCommit(false);
+	public void upgradeLevels() {
+		TransactionStatus status = this.transactionManager.getTransaction(new DefaultTransactionDefinition());
 
 		try {									   
             List<User> users = userDao.getAll();
@@ -40,14 +37,10 @@ public class UserService {
                     upgradeLevel(user);
                 }
             }
-            c.commit();
-        } catch (Exception e) {
-            c.rollback();
+			this.transactionManager.commit(status);
+		} catch (RuntimeException e) {
+			this.transactionManager.rollback(status);
             throw e;
-        } finally {
-            DataSourceUtils.releaseConnection(c, dataSource);
-            TransactionSynchronizationManager.unbindResource(this.dataSource);
-            TransactionSynchronizationManager.clearSynchronization();
         }
     }
 
