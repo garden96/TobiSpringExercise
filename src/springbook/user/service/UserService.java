@@ -1,5 +1,6 @@
 package springbook.user.service;
 
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -26,11 +27,15 @@ public class UserService {
 	public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
 	private UserDao userDao;
-
+	private MailSender mailSender;
 	private PlatformTransactionManager transactionManager;
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
+	}
+
+	public void setMailSender(MailSender mailSender) {
+		this.mailSender = mailSender;
 	}
 
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -73,8 +78,6 @@ public class UserService {
     }
 
 	private void sendUpgradeEMail(User user) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("mail.sunnygarden.net");
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
@@ -82,7 +85,7 @@ public class UserService {
         mailMessage.setSubject("Upgrade 안내");
         mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
 
-        mailSender.send(mailMessage);
+        this.mailSender.send(mailMessage);
 	}
 
 	public void add(User user) {
