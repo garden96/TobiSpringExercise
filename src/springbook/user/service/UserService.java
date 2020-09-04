@@ -73,25 +73,16 @@ public class UserService {
     }
 
 	private void sendUpgradeEMail(User user) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "mail.sunnygarden.net");
-        Session s = Session.getInstance(props, null);
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("mail.sunnygarden.net");
 
-        MimeMessage message = new MimeMessage(s);
-        try{
-            message.setFrom( new InternetAddress("admin@sunnygarden.net"));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-            message.setSubject("Upgrade 안내");
-            message.setText("사용자님의 등급이 " + user.getLevel().name());
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("admin@sunnygarden.net");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
 
-            Transport.send(message);
-        } catch (AddressException e) {
-            throw new RuntimeException();
-        } catch (MessagingException e) {
-            throw new RuntimeException();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException();
-        }
+        mailSender.send(mailMessage);
 	}
 
 	public void add(User user) {
