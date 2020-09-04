@@ -11,7 +11,6 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,11 +34,11 @@ public class UserServiceTest {
 	@Before
 	public void setUp() {
 		users = Arrays.asList(
-                new User("nathan", "안정원", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
-                new User("sunny", "현선", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-                new User("jane", "안재인", "p3", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
-                new User("junu", "안준우", "p4", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD),
-                new User("nayoon", "현나윤", "p5", Level.GOLD, 100, Integer.MAX_VALUE)
+                new User("nathan", "안정원", "p1", "nathan@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
+                new User("sunny", "현선", "p2", "sunny@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
+                new User("jane", "안재인", "p3", "jane@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
+                new User("junu", "안준우", "p4", "junu@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD),
+                new User("nayoon", "현나윤", "p5", "nayoon@sunnygarden.net", Level.GOLD, 100, Integer.MAX_VALUE)
 		);
 	}
 
