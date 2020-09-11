@@ -35,10 +35,10 @@ public class UserDaoTest {
 
 	@Before
 	public void setUp() {
-		this.user1 = new User("nathan", "안정원", "father", Level.BASIC, 10, 0);
-		this.user2 = new User("sunny", "현선", "mother", Level.SILVER, 55, 10);
-		this.user3 = new User("jane", "안재인", "daughter", Level.GOLD, 100, 40);
-        this.user4 = new User("junu", "안준우", "son", Level.GOLD, 101, 41);
+		this.user1 = new User("nathan", "안정원", "father", "nathan@sunnygarden.net", Level.BASIC, 10, 0);
+		this.user2 = new User("sunny", "현선", "mother", "sunny@sunnygarden.net", Level.SILVER, 55, 10);
+		this.user3 = new User("jane", "안재인", "daughter", "jane@sunnygarden.net", Level.GOLD, 100, 40);
+        this.user4 = new User("junu", "안준우", "son", "junu@sunnygarden.net", Level.GOLD, 101, 41);
 	}
 	
 	@Test
@@ -116,6 +116,7 @@ public class UserDaoTest {
 		assertThat(user1.getId(), is(user2.getId()));
 		assertThat(user1.getName(), is(user2.getName()));
 		assertThat(user1.getPassword(), is(user2.getPassword()));
+        assertThat(user1.getEmail(), is(user2.getEmail()));
 		assertThat(user1.getLevel(), is(user2.getLevel()));
 		assertThat(user1.getLogin(), is(user2.getLogin()));
 		assertThat(user1.getRecommend(), is(user2.getRecommend()));
@@ -152,6 +153,7 @@ public class UserDaoTest {
 
 		user1.setName("안정원");
 		user1.setPassword("good");
+		user1.setEmail("user1@sunnygarden.net");
 		user1.setLevel(Level.GOLD);
 		user1.setLogin(1000);
 		user1.setRecommend(999);
