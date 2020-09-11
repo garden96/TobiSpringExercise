@@ -21,9 +21,12 @@
         <property name="mailSender" ref="mailSender" />
     </bean>
 
+    <!-- mail 발송을 막기위해 구현체를 dummyMailSender로 변경
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="mail.server.com" />
     </bean>
+    -->
+    <bean id="mailSender" class="springbook.user.service.DummyMailSender" />
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />

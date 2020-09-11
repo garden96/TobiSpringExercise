@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,6 +28,7 @@ public class UserServiceTest {
 
 	@Autowired 	UserService userService;
 	@Autowired  UserDao userDao;
+    @Autowired  MailSender mailSender;
     @Autowired  PlatformTransactionManager transactionManager;
 
 	List<User> users;	// test fixture
@@ -96,7 +98,8 @@ public class UserServiceTest {
 	public void upgradeAllOrNothing() throws Exception {
 		UserService testUserService = new TestUserService(users.get(3).getId());  
 		testUserService.setUserDao(this.userDao);
-		testUserService.setTransactionManager(transactionManager);
+		testUserService.setTransactionManager(this.transactionManager);
+		testUserService.setMailSender(this.mailSender);
 
 		userDao.deleteAll();			  
 		for(User user : users) userDao.add(user);
