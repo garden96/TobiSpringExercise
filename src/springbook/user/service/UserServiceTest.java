@@ -15,6 +15,7 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -185,14 +186,22 @@ public class UserServiceTest {
 	}
 
 	@Test
-	public void upgradeAllOrNothing() {
+	public void upgradeAllOrNothing() throws Exception {
 		TestUserService testUserService = new TestUserService(users.get(3).getId());
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 
-		UserServiceTx txUserService = new UserServiceTx();
-		txUserService.setTransactionManager(transactionManager);
-		txUserService.setUserService(testUserService);
+		TransactionHandler txHandler = new TransactionHandler();
+		txHandler.setTarget(testUserService);
+		txHandler.setTransactionManager(transactionManager);
+		txHandler.setPattern("upgradeLevels");
+
+		// create a UserService interface dynamic proxy.
+		UserService txUserService = (UserService) Proxy.newProxyInstance(
+		        getClass().getClassLoader(),
+                new Class[] {UserService.class},
+                txHandler );
+
 
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
