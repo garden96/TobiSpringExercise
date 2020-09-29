@@ -5,9 +5,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,9 +35,10 @@ public class UserServiceTest {
 
 	@Autowired 	UserService userService;
 	@Autowired  UserDao userDao;
-	@Autowired UserServiceImpl userServiceImpl;
+	@Autowired  UserServiceImpl userServiceImpl;
     @Autowired  MailSender mailSender;
     @Autowired  PlatformTransactionManager transactionManager;
+	@Autowired  ApplicationContext context;
 
 	List<User> users;	// test fixture
 
@@ -185,14 +188,18 @@ public class UserServiceTest {
 	}
 
 	@Test
-	public void upgradeAllOrNothing() {
+    @DirtiesContext   // 스프링이 생해준 txProxyFactoryBean 빈을 사용하지 않고 값을 변경하여 사용하기 때문에 테스트 후 컨텍스트 무효화를 요청
+	public void upgradeAllOrNothing() throws Exception {
 		TestUserService testUserService = new TestUserService(users.get(3).getId());
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 
-		UserServiceTx txUserService = new UserServiceTx();
-		txUserService.setTransactionManager(transactionManager);
-		txUserService.setUserService(testUserService);
+		TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+		txProxyFactoryBean.setTarget(testUserService);
+
+		// get a dynamic proxy for UserService from the factory bean.
+		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
 
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
