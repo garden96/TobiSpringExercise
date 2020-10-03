@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -194,11 +195,11 @@ public class UserServiceTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 
-		TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);  // userService Bean은 spring의 ProxyFactoryBean 임
 		txProxyFactoryBean.setTarget(testUserService);
 
 		// get a dynamic proxy for UserService from the factory bean.
-		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+		UserService txUserService = (UserService) txProxyFactoryBean.getObject();       // FactoryBean type 이므로 동일하게 getObject() 로 프록시를 가져온다.
 
 
 		userDao.deleteAll();
