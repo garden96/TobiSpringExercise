@@ -35,8 +35,9 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 public class UserServiceTest {
 
 	@Autowired 	UserService userService;
+    @Autowired 	UserService testUserService;    // 같은 타입의 빈이 두개 존재하므로 필드 이름을 기준으로 주입되는 빈이 결정.
+                                                // 자동 프록시 생성기에의해 프랜잭션 부가기능이 testUserService 빈에 적용됐는지 확인는 것이 목적임.
 	@Autowired  UserDao userDao;
-	@Autowired  UserServiceImpl userServiceImpl;
     @Autowired  MailSender mailSender;
     @Autowired  PlatformTransactionManager transactionManager;
 	@Autowired  ApplicationContext context;
@@ -189,24 +190,13 @@ public class UserServiceTest {
 	}
 
 	@Test
-    @DirtiesContext   // 스프링이 생해준 txProxyFactoryBean 빈을 사용하지 않고 값을 변경하여 사용하기 때문에 테스트 후 컨텍스트 무효화를 요청
-	public void upgradeAllOrNothing() throws Exception {
-		TestUserService testUserService = new TestUserService(users.get(3).getId());
-		testUserService.setUserDao(userDao);
-		testUserService.setMailSender(mailSender);
-
-		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);  // userService Bean은 spring의 ProxyFactoryBean 임
-		txProxyFactoryBean.setTarget(testUserService);
-
-		// get a dynamic proxy for UserService from the factory bean.
-		UserService txUserService = (UserService) txProxyFactoryBean.getObject();       // FactoryBean type 이므로 동일하게 getObject() 로 프록시를 가져온다.
-
+    public void upgradeAllOrNothing() {
 
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
 
 		try {
-			txUserService.upgradeLevels();
+            testUserService.upgradeLevels();
 			fail("TestUserServiceException expected");
 		}
 		catch(TestUserServiceException e) {
@@ -216,12 +206,9 @@ public class UserServiceTest {
 	}
 
 
-	static class TestUserService extends UserServiceImpl {
-		private String id;
+	static class TestUserServiceImpl extends UserServiceImpl {
+		private String id = "junu"; // users(3).getId()
 
-		private TestUserService(String id) {
-			this.id = id;
-		}
 
 		protected void upgradeLevel(User user) {
 			if (user.getId().equals(this.id)) throw new TestUserServiceException();
