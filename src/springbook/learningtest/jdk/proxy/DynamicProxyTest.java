@@ -3,6 +3,8 @@ package springbook.learningtest.jdk.proxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -95,7 +97,50 @@ public class DynamicProxyTest {
         }
     }
 
+    @Test
+    public void classNamePointcutAdvisor() {
 
+        // 포인트컷 준비
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            public ClassFilter getClassFilter() {   // 익명 내부 클래스 방식으로 클래스를 정의
+                return new ClassFilter() {
+                    public boolean matches(Class<?> clazz) {
+                        return clazz.getSimpleName().startsWith("HelloT");  // class 이름이 HelloT 로 시작하는 것만 선정하도록 설정.
+                    }
+                };
+            }
+        };
+        classMethodPointcut.setMappedName("sayH*"); // method 이름이 sayH로 시작하는 것만 선정하도록 설정.
+
+        // 테스트
+        checkAdviced(new HelloTarget(), classMethodPointcut, true);     // 적용 클래스
+
+        class HelloWorld extends HelloTarget {};
+        checkAdviced(new HelloWorld(), classMethodPointcut, false);     // 비적용 클래스
+
+        class HelloToby extends HelloTarget {};
+        checkAdviced(new HelloToby(), classMethodPointcut, true);       // 적용 클래스
+    }
+
+
+    private void checkAdviced(Object target, Pointcut pointcut, boolean adviced) {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(target);
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+        Hello proxiedHello = (Hello) pfBean.getObject();
+
+        if (adviced) {
+            assertThat(proxiedHello.sayHello("Toby"), is("HELLO TOBY"));    // method 선정방식을 통한 어드바이스 적용
+            assertThat(proxiedHello.sayHi("Toby"), is("HI TOBY"));          // method 선정방식을 통한 어드바이스 적용
+            assertThat(proxiedHello.sayThankYou("Toby"), is("Thank You Toby"));
+        }
+        else {
+            // advice 적용 대상 아님
+            assertThat(proxiedHello.sayHello("Toby"), is("Hello Toby"));
+            assertThat(proxiedHello.sayHi("Toby"), is("Hi Toby"));
+            assertThat(proxiedHello.sayThankYou("Toby"), is("Thank You Toby"));
+        }
+    }
 
     // interface for the target class
     static interface Hello {
