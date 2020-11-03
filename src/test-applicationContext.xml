@@ -42,7 +42,7 @@
         <property name="mailSender" ref="mailSender"/>
     </bean>
 
-    <bean id="testUserService" class="springbook.user.service.UserServiceTest$TestUserServiceImpl"
+    <bean id="testUserService" class="springbook.user.service.UserServiceTest$TestUserService"
           parent="userService"/>
 
     <bean id="mailSender" class="springbook.user.service.DummyMailSender"/>
