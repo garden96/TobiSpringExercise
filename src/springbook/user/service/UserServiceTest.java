@@ -206,7 +206,7 @@ public class UserServiceTest {
 	}
 
 
-	static class TestUserServiceImpl extends UserServiceImpl {
+	static class TestUserService extends UserServiceImpl {
 		private String id = "junu"; // users(3).getId()
 
 
