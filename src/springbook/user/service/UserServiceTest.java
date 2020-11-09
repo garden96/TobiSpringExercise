@@ -4,13 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -206,14 +205,25 @@ public class UserServiceTest {
 	}
 
 
-	static class TestUserService extends UserServiceImpl {
-		private String id = "junu"; // users(3).getId()
+    @Test(expected= TransientDataAccessResourceException.class) // 예외가 리턴되면 테스트 성공
+    public void readOnlyTransactionAttribute() {
+        testUserService.getAll();
+    }
 
+    static class TestUserService extends UserServiceImpl {
+		private String id = "junu"; // users(3).getId()
 
 		protected void upgradeLevel(User user) {
 			if (user.getId().equals(this.id)) throw new TestUserServiceException();
 			super.upgradeLevel(user);
 		}
+
+        public List<User> getAll() {        // get~ 으로 시작하는 method 이므로 readOlny transaction 대상임.
+            for(User user : super.getAll()) {
+                super.update(user);         // readOnly transaction 대상 method에 강제 쓰기 시도 하므로 예외 발생해야함.
+            }
+            return null;
+        }
 	}
 
 	static class TestUserServiceException extends RuntimeException {
