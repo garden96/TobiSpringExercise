@@ -8,7 +8,6 @@ import springbook.user.domain.User;
 
 import java.util.List;
 
-
 public class UserServiceImpl implements UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;

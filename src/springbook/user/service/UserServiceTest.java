@@ -33,26 +33,26 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserServiceTest {
 
-	@Autowired 	UserService userService;
+    @Autowired 	UserService userService;
     @Autowired 	UserService testUserService;    // 같은 타입의 빈이 두개 존재하므로 필드 이름을 기준으로 주입되는 빈이 결정.
                                                 // 자동 프록시 생성기에의해 프랜잭션 부가기능이 testUserService 빈에 적용됐는지 확인는 것이 목적임.
-	@Autowired  UserDao userDao;
+    @Autowired  UserDao userDao;
     @Autowired  MailSender mailSender;
     @Autowired  PlatformTransactionManager transactionManager;
-	@Autowired  ApplicationContext context;
+    @Autowired  ApplicationContext context;
 
-	List<User> users;	// test fixture
+    List<User> users;   // test fixture
 
-	@Before
-	public void setUp() {
-		users = Arrays.asList(
+    @Before
+    public void setUp() {
+        users = Arrays.asList(
                 new User("nathan", "안정원", "p1", "nathan@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
                 new User("sunny", "현선", "p2", "sunny@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
                 new User("jane", "안재인", "p3", "jane@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
                 new User("junu", "안준우", "p4", "junu@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD),
                 new User("nayoon", "현나윤", "p5", "nayoon@sunnygarden.net", Level.GOLD, 100, Integer.MAX_VALUE)
-		);
-	}
+        );
+    }
 
     @Test
     /**
@@ -63,59 +63,59 @@ public class UserServiceTest {
     }
 
     @Test
-	public void upgradeLevels() throws Exception {
-		UserServiceImpl userServiceImpl = new UserServiceImpl();
+    public void upgradeLevels() throws Exception {
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
 
-		MockUserDao mockUserDao = new MockUserDao(this.users);
-		userServiceImpl.setUserDao(mockUserDao);
+        MockUserDao mockUserDao = new MockUserDao(this.users);
+        userServiceImpl.setUserDao(mockUserDao);
 
-		MockMailSender mockMailSender = new MockMailSender();
-		userServiceImpl.setMailSender(mockMailSender);
+        MockMailSender mockMailSender = new MockMailSender();
+        userServiceImpl.setMailSender(mockMailSender);
 
-		userServiceImpl.upgradeLevels();
+        userServiceImpl.upgradeLevels();
 
-		List<User> updated = mockUserDao.getUpdated();
-		assertThat(updated.size(), is(2));
-		checkUserAndLevel(updated.get(0), "sunny", Level.SILVER);
-		checkUserAndLevel(updated.get(1), "junu", Level.GOLD);
+        List<User> updated = mockUserDao.getUpdated();
+        assertThat(updated.size(), is(2));
+        checkUserAndLevel(updated.get(0), "sunny", Level.SILVER);
+        checkUserAndLevel(updated.get(1), "junu", Level.GOLD);
 
-		List<String> request = mockMailSender.getRequests();
-		assertThat(request.size(), is(2));
-		assertThat(request.get(0), is(users.get(1).getEmail()));
-		assertThat(request.get(1), is(users.get(3).getEmail()));
-	}
+        List<String> request = mockMailSender.getRequests();
+        assertThat(request.size(), is(2));
+        assertThat(request.get(0), is(users.get(1).getEmail()));
+        assertThat(request.get(1), is(users.get(3).getEmail()));
+    }
 
-	private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
-		assertThat(updated.getId(), is(expectedId));
-		assertThat(updated.getLevel(), is(expectedLevel));
-	}
+    private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+        assertThat(updated.getId(), is(expectedId));
+        assertThat(updated.getLevel(), is(expectedLevel));
+    }
 
 
-	static class MockUserDao implements UserDao {
-		private List<User> users;
-		private List<User> updated = new ArrayList();
+    static class MockUserDao implements UserDao {
+        private List<User> users;
+        private List<User> updated = new ArrayList();
 
-		private MockUserDao(List<User> users) {
-			this.users = users;
-		}
+        private MockUserDao(List<User> users) {
+            this.users = users;
+        }
 
-		public List<User> getUpdated() {
-			return this.updated;
-		}
+        public List<User> getUpdated() {
+            return this.updated;
+        }
 
-		public List<User> getAll() {
-			return this.users;
-		}
+        public List<User> getAll() {
+            return this.users;
+        }
 
-		public void update(User user) {
-			updated.add(user);
-		}
+        public void update(User user) {
+            updated.add(user);
+        }
 
-		public void add(User user) { throw new UnsupportedOperationException(); }
-		public void deleteAll() { throw new UnsupportedOperationException(); }
-		public User get(String id) { throw new UnsupportedOperationException(); }
-		public int getCount() { throw new UnsupportedOperationException(); }
-	}
+        public void add(User user) { throw new UnsupportedOperationException(); }
+        public void deleteAll() { throw new UnsupportedOperationException(); }
+        public User get(String id) { throw new UnsupportedOperationException(); }
+        public int getCount() { throw new UnsupportedOperationException(); }
+    }
 
 
     static class MockMailSender implements MailSender {
@@ -131,10 +131,10 @@ public class UserServiceTest {
 
         public void send(SimpleMailMessage[] mailMessage) throws MailException {
         }
-	}
+    }
 
-	@Test
-	public void mockUpgradeLevels() throws Exception {
+    @Test
+    public void mockUpgradeLevels() throws Exception {
         UserServiceImpl userServiceImpl = new UserServiceImpl();
 
         UserDao mockUserDao = mock(UserDao.class);
@@ -170,64 +170,64 @@ public class UserServiceTest {
         }
     }
 
-	@Test
-	public void add() {
-		userDao.deleteAll();
+    @Test
+    public void add() {
+        userDao.deleteAll();
 
-		User userWithLevel = users.get(4);	  // GOLD 레벨
-		User userWithoutLevel = users.get(0);
-		userWithoutLevel.setLevel(null);
+        User userWithLevel = users.get(4);      // GOLD 레벨
+        User userWithoutLevel = users.get(0);
+        userWithoutLevel.setLevel(null);
 
-		userService.add(userWithLevel);
-		userService.add(userWithoutLevel);
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
 
-		User userWithLevelRead = userDao.get(userWithLevel.getId());
-		User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
+        User userWithLevelRead = userDao.get(userWithLevel.getId());
+        User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
 
-		assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
-		assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
-	}
+        assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
+        assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+    }
 
-	@Test
+    @Test
     public void upgradeAllOrNothing() {
 
-		userDao.deleteAll();
-		for(User user : users) userDao.add(user);
+        userDao.deleteAll();
+        for (User user : users) userDao.add(user);
 
-		try {
+        try {
             testUserService.upgradeLevels();
-			fail("TestUserServiceException expected");
-		}
-		catch(TestUserServiceException e) {
-		}
+            fail("TestUserServiceException expected");
+        }
+        catch (TestUserServiceException e) {
+        }
 
-		checkLevelUpgraded(users.get(1), false);
-	}
+        checkLevelUpgraded(users.get(1), false);
+    }
 
 
-    @Test(expected= TransientDataAccessResourceException.class) // 예외가 리턴되면 테스트 성공
+    @Test(expected = TransientDataAccessResourceException.class) // 예외가 리턴되면 테스트 성공
     public void readOnlyTransactionAttribute() {
         testUserService.getAll();
     }
 
     static class TestUserService extends UserServiceImpl {
-		private String id = "junu"; // users(3).getId()
+        private String id = "junu"; // users(3).getId()
 
-		protected void upgradeLevel(User user) {
-			if (user.getId().equals(this.id)) throw new TestUserServiceException();
-			super.upgradeLevel(user);
-		}
+        protected void upgradeLevel(User user) {
+            if (user.getId().equals(this.id)) throw new TestUserServiceException();
+            super.upgradeLevel(user);
+        }
 
         public List<User> getAll() {        // get~ 으로 시작하는 method 이므로 readOlny transaction 대상임.
-            for(User user : super.getAll()) {
+            for (User user : super.getAll()) {
                 super.update(user);         // readOnly transaction 대상 method에 강제 쓰기 시도 하므로 예외 발생해야함.
             }
             return null;
         }
-	}
+    }
 
-	static class TestUserServiceException extends RuntimeException {
-	}
+    static class TestUserServiceException extends RuntimeException {
+    }
 
 
 }
