@@ -5,6 +5,7 @@ import springbook.user.domain.User;
 
 import java.util.List;
 
+@Transactional
 public interface UserService {
     void add(User user);
     void deleteAll();
