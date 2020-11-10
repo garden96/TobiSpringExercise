@@ -24,8 +24,6 @@
     <!-- aop -->
     <tx:annotation-driven />
 
-    <aop:config>
-    </aop:config>
 
     <!--  application components -->
 
