@@ -25,13 +25,7 @@
     <tx:annotation-driven />
 
     <aop:config>
-        <aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)"/>
     </aop:config>
-
-    <tx:advice id="transactionAdvice">
-        <tx:attributes>
-        </tx:attributes>
-    </tx:advice>
 
     <!--  application components -->
 
