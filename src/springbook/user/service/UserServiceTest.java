@@ -221,7 +221,7 @@ public class UserServiceTest {
                                                                                             // 기존에 시작된 트랜잭션이 없으니, 새로운 트랜잭션을 시작시키고 정보를 반환.
                                                                                             // 동시에 만들어진 트랜잭션을 다른 곳에서도 사용할수 있도록 동기화 함.
 
-        userService.deleteAll();
+        userDao.deleteAll();                                                                // jdbcTemplate을 통해 이미 시작된 트랜잭션이 있다면 자동으로 참여되어 Exception 발생.
 
         userService.add(users.get(0));
         userService.add(users.get(1));
