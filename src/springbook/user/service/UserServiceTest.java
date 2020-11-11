@@ -210,6 +210,14 @@ public class UserServiceTest {
         testUserService.getAll();
     }
 
+    @Test
+    public void transactionSync() {
+        userService.deleteAll();
+
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+    }
+
     static class TestUserService extends UserServiceImpl {
         private String id = "junu"; // users(3).getId()
 
