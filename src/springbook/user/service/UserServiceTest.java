@@ -214,19 +214,23 @@ public class UserServiceTest {
 
     @Test
     public void transactionSync() {
-        DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();     // 기본값을 사용하여 트랜잭션정의를 생성
-        txDefinition.setReadOnly(true);                                                     // 읽기 전용 트랜잭션으로 정의
 
+        DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();     // 기본값을 사용하여 트랜잭션정의를 생성
         TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);       // 트랜잭션 메니져에게 트랜잭션을 요청.
                                                                                             // 기존에 시작된 트랜잭션이 없으니, 새로운 트랜잭션을 시작시키고 정보를 반환.
                                                                                             // 동시에 만들어진 트랜잭션을 다른 곳에서도 사용할수 있도록 동기화 함.
+        try {
+            userService.deleteAll();
+            assertThat(userDao.getCount(), is(0));
 
-        userDao.deleteAll();                                                                // jdbcTemplate을 통해 이미 시작된 트랜잭션이 있다면 자동으로 참여되어 Exception 발생.
+            userService.add(users.get(0));
+            userService.add(users.get(1));
+            assertThat(userDao.getCount(), is(2));
+        }
+        finally {
+            transactionManager.rollback(txStatus);                                          // 테스트 결과와 관계없이 테스트 종료후 롤백 (DB를 테스트 이전 상태로 복구)
+        }
 
-        userService.add(users.get(0));
-        userService.add(users.get(1));
-
-        transactionManager.commit(txStatus);                                                // 앞서 시작한 트랜잭션을 commit.
     }
 
     static class TestUserService extends UserServiceImpl {
