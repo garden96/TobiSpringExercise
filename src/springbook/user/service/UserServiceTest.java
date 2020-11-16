@@ -13,6 +13,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
+@Transactional
+@TransactionConfiguration(defaultRollback = false)      // 롤백 여부에 대한 기본 설정과 트랜잭션메니저 빈을 지정하는데 사용
+                                                        // 디폴트 트랜잭션 메니저 아이디는 관례를 따라 transactionManager.
 public class UserServiceTest {
 
     @Autowired 	UserService userService;
@@ -215,8 +219,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @Transactional
-    @Rollback(false)
+    @Rollback           // 메소드에서 디폴트 설정과 그 밖의 롤백 방법으로 재설정 가능.
     public void transactionSync() {
 
             userService.deleteAll();
