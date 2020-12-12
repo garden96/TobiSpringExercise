@@ -29,6 +29,8 @@
 
     <bean id="userDao" class="springbook.user.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource"/>
+
+        <property name="sqlAdd" value="insert into users(id, name, password, email, level, login, recommend) values(?,?,?,?,?,?,?)" />
     </bean>
 
     <bean id="userService" class="springbook.user.service.UserServiceImpl">
