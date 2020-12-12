@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 
 public class UserDaoJdbc implements UserDao {
@@ -29,49 +30,19 @@ public class UserDaoJdbc implements UserDao {
                     return user;
                 }
             };
-
+    private Map<String, String> sqlMap;
 
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
-    private String sqlAdd;
-    private String sqlGet;
-    private String sqlGetAll;
-    private String sqlDeleteAll;
-    private String sqlGetCount;
-    private String sqlUpdate;
-
-    public void setSqlAdd(String sqlAdd) {
-        this.sqlAdd = sqlAdd;
+    public void setSqlMap(Map<String, String> sqlMap) {
+        this.sqlMap = sqlMap;
     }
-
-    public void setSqlGet(String sqlGet) {
-        this.sqlGet = sqlGet;
-    }
-
-    public void setSqlGetAll(String sqlGetAll) {
-        this.sqlGetAll = sqlGetAll;
-    }
-
-    public void setSqlDeleteAll(String sqlDeleteAll) {
-        this.sqlDeleteAll = sqlDeleteAll;
-    }
-
-    public void setSqlGetCount(String sqlGetCount) {
-        this.sqlGetCount = sqlGetCount;
-    }
-
-    public void setSqlUpdate(String sqlUpdate) {
-        this.sqlUpdate = sqlUpdate;
-    }
-
-
 
     public void add(User user) {
         this.jdbcTemplate.update(
-                this.sqlAdd,
+                this.sqlMap.get("add"),
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(),
                 user.getLevel().intValue(), user.getLogin(), user.getRecommend()
         );
@@ -79,32 +50,32 @@ public class UserDaoJdbc implements UserDao {
 
     public User get(String id) {
         return this.jdbcTemplate.queryForObject(
-                this.sqlGet,
+                this.sqlMap.get("get"),
                 new Object[]{id},
                 this.userMapper
         );
     }
 
     public void deleteAll() {
-        this.jdbcTemplate.update(this.sqlDeleteAll);
+        this.jdbcTemplate.update(this.sqlMap.get("deleteAll"));
     }
 
     public int getCount() {
-        return this.jdbcTemplate.queryForInt(this.sqlGetCount);
+        return this.jdbcTemplate.queryForInt(this.sqlMap.get("getCount"));
     }
 
     public List<User> getAll() {
         return this.jdbcTemplate.query(
-                this.sqlGetAll,
+                this.sqlMap.get("getAll"),
                 this.userMapper
         );
     }
 
     public void update(User user) {
         this.jdbcTemplate.update(
-                sqlUpdate,
-            user.getName(), user.getPassword(), user.getEmail(),
-            user.getLevel().intValue(), user.getLogin(), user.getRecommend(),
-            user.getId());
+                sqlMap.get("update"),
+                user.getName(), user.getPassword(), user.getEmail(),
+                user.getLevel().intValue(), user.getLogin(), user.getRecommend(),
+                user.getId());
     }
 }
