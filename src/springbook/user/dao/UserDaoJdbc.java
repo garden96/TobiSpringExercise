@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
+import springbook.user.sqlservice.SqlService;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import java.util.List;
 public class UserDaoJdbc implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private SqlService sqlService;
 
     private RowMapper<User> userMapper =
             new RowMapper<User>() {
@@ -30,52 +32,50 @@ public class UserDaoJdbc implements UserDao {
                 }
             };
 
-
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public void setSqlService(SqlService sqlService) {
+        this.sqlService = sqlService;
+    }
 
-	public void add(User user) {
+    public void add(User user) {
         this.jdbcTemplate.update(
-                "insert into users(id, name, password, email, level, login, recommend) " +
-                        "values(?,?,?,?,?,?,?)",
+                this.sqlService.getSql("userAdd"),
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(),
                 user.getLevel().intValue(), user.getLogin(), user.getRecommend()
         );
     }
 
-
     public User get(String id) {
         return this.jdbcTemplate.queryForObject(
-                "select * from users where id = ?",
+                this.sqlService.getSql("userGet"),
                 new Object[]{id},
                 this.userMapper
         );
     }
 
     public void deleteAll() {
-        this.jdbcTemplate.update("delete from users");
+        this.jdbcTemplate.update(this.sqlService.getSql("userDeleteAll"));
     }
 
     public int getCount() {
-        return this.jdbcTemplate.queryForInt("select count(*) from users");
+        return this.jdbcTemplate.queryForInt(this.sqlService.getSql("userGetCount"));
     }
 
     public List<User> getAll() {
         return this.jdbcTemplate.query(
-                "select * from users order by id",
+                this.sqlService.getSql("userGetAll"),
                 this.userMapper
         );
     }
 
     public void update(User user) {
         this.jdbcTemplate.update(
-            "update users set name = ?, password = ?, email = ?, " +
-                    "level = ?, login = ?, recommend = ? " +
-                 "where id = ? ",
-            user.getName(), user.getPassword(), user.getEmail(),
-            user.getLevel().intValue(), user.getLogin(), user.getRecommend(),
-            user.getId());
+                sqlService.getSql("userUpdate"),
+                user.getName(), user.getPassword(), user.getEmail(),
+                user.getLevel().intValue(), user.getLogin(), user.getRecommend(),
+                user.getId());
     }
 }
