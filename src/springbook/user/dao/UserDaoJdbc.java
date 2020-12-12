@@ -37,12 +37,39 @@ public class UserDaoJdbc implements UserDao {
 
 
     private String sqlAdd;
+    private String sqlGet;
+    private String sqlGetAll;
+    private String sqlDeleteAll;
+    private String sqlGetCount;
+    private String sqlUpdate;
 
     public void setSqlAdd(String sqlAdd) {
         this.sqlAdd = sqlAdd;
     }
 
-	public void add(User user) {
+    public void setSqlGet(String sqlGet) {
+        this.sqlGet = sqlGet;
+    }
+
+    public void setSqlGetAll(String sqlGetAll) {
+        this.sqlGetAll = sqlGetAll;
+    }
+
+    public void setSqlDeleteAll(String sqlDeleteAll) {
+        this.sqlDeleteAll = sqlDeleteAll;
+    }
+
+    public void setSqlGetCount(String sqlGetCount) {
+        this.sqlGetCount = sqlGetCount;
+    }
+
+    public void setSqlUpdate(String sqlUpdate) {
+        this.sqlUpdate = sqlUpdate;
+    }
+
+
+
+    public void add(User user) {
         this.jdbcTemplate.update(
                 this.sqlAdd,
                 user.getId(), user.getName(), user.getPassword(), user.getEmail(),
@@ -50,35 +77,32 @@ public class UserDaoJdbc implements UserDao {
         );
     }
 
-
     public User get(String id) {
         return this.jdbcTemplate.queryForObject(
-                "select * from users where id = ?",
+                this.sqlGet,
                 new Object[]{id},
                 this.userMapper
         );
     }
 
     public void deleteAll() {
-        this.jdbcTemplate.update("delete from users");
+        this.jdbcTemplate.update(this.sqlDeleteAll);
     }
 
     public int getCount() {
-        return this.jdbcTemplate.queryForInt("select count(*) from users");
+        return this.jdbcTemplate.queryForInt(this.sqlGetCount);
     }
 
     public List<User> getAll() {
         return this.jdbcTemplate.query(
-                "select * from users order by id",
+                this.sqlGetAll,
                 this.userMapper
         );
     }
 
     public void update(User user) {
         this.jdbcTemplate.update(
-            "update users set name = ?, password = ?, email = ?, " +
-                    "level = ?, login = ?, recommend = ? " +
-                 "where id = ? ",
+                sqlUpdate,
             user.getName(), user.getPassword(), user.getEmail(),
             user.getLevel().intValue(), user.getLogin(), user.getRecommend(),
             user.getId());
