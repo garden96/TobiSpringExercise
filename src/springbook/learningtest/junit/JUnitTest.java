@@ -35,7 +35,6 @@ public class JUnitTest {
 	}
 	
 	@Test public void test2() {
-	    //
 		assertThat(testObjects, not(hasItem(this)));
 		testObjects.add(this);
 		

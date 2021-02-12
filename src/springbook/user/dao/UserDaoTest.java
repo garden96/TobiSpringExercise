@@ -1,5 +1,13 @@
 package springbook.user.dao;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,20 +19,13 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
 public class UserDaoTest {
-
 	@Autowired UserDao dao; 
 	@Autowired DataSource dataSource;
 	
@@ -41,55 +42,50 @@ public class UserDaoTest {
         this.user4 = new User("junu", "안준우", "son", "junu@sunnygarden.net", Level.GOLD, 101, 41);
 	}
 	
-	@Test
-	public void addAndGet() {
-
+	@Test 
+	public void andAndGet() {		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 
 		dao.add(user1);
 		dao.add(user2);
 		assertThat(dao.getCount(), is(2));
-
+		
 		User userget1 = dao.get(user1.getId());
 		checkSameUser(userget1, user1);
-
+		
 		User userget2 = dao.get(user2.getId());
 		checkSameUser(userget2, user2);
 	}
 
-    @Test(expected=EmptyResultDataAccessException.class)
-    public void getUserFailure() throws SQLException {
-
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
-
-        dao.get("unknown_id");
-    }
-
-	@Test
-	public void count() {
-
+	@Test(expected=EmptyResultDataAccessException.class)
+	public void getUserFailure() throws SQLException {
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
+		
+		dao.get("unknown_id");
+	}
 
+	
+	@Test
+	public void count() {
+		dao.deleteAll();
+		assertThat(dao.getCount(), is(0));
+				
 		dao.add(user1);
 		assertThat(dao.getCount(), is(1));
-
+		
 		dao.add(user2);
 		assertThat(dao.getCount(), is(2));
-
+		
 		dao.add(user3);
 		assertThat(dao.getCount(), is(3));
 	}
-
+	
 	@Test
-    /*
-     * 나중에 insert 된 데이터가 먼저 추출되므로 입력한 역순으로 비교.
-     */
 	public void getAll()  {
-
 		dao.deleteAll();
+		
 		List<User> users0 = dao.getAll();
 		assertThat(users0.size(), is(0));
 
@@ -122,16 +118,18 @@ public class UserDaoTest {
 		assertThat(user1.getRecommend(), is(user2.getRecommend()));
 	}
 
-	@Test(expected= DuplicateKeyException.class)
+	@Test(expected=DuplicateKeyException.class)
 	public void duplciateKey() {
 		dao.deleteAll();
+		
 		dao.add(user1);
 		dao.add(user1);
 	}
-
+	
 	@Test
 	public void sqlExceptionTranslate() {
 		dao.deleteAll();
+		
 		try {
 			dao.add(user1);
 			dao.add(user1);
@@ -143,7 +141,7 @@ public class UserDaoTest {
 			assertThat(transEx, is(DuplicateKeyException.class));
 		}
 	}
-
+	
 	@Test
 	public void update() {
 		dao.deleteAll();
@@ -157,11 +155,11 @@ public class UserDaoTest {
 		user1.setLevel(Level.GOLD);
 		user1.setLogin(1000);
 		user1.setRecommend(999);
+		
 		dao.update(user1);
-
+		
 		User user1update = dao.get(user1.getId());
 		checkSameUser(user1, user1update);
-
 		User user2same = dao.get(user2.getId());
 		checkSameUser(user2, user2same);
 	}
