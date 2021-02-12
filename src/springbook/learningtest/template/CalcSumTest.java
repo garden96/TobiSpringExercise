@@ -1,12 +1,12 @@
 package springbook.learningtest.template;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class CalcSumTest {
 	Calculator calculator;

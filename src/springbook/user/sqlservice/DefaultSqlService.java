@@ -1,8 +1,8 @@
 package springbook.user.sqlservice;
 
 public class DefaultSqlService extends BaseSqlService {
-	public DefaultSqlService() {
-		setSqlReader(new JaxbXmlSqlReader());
-		setSqlRegistry(new HashMapSqlRegistry());
-	}
+    public DefaultSqlService() {
+        setSqlReader(new JaxbXmlSqlReader());
+        setSqlRegistry(new HashMapSqlRegistry());
+    }
 }

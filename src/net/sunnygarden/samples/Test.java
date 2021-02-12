@@ -16,8 +16,8 @@ public class Test {
         testStrings.add("aaab123");
         testStrings.add("aaa");
 
-        for( String str : testStrings ) {
-            System.out.println("["+ str +"] "+ (str.matches(regexPattern)? "matches":"doesn't match") + " with pattern["+ regexPattern +"].");
+        for (String str : testStrings) {
+            System.out.println("[" + str + "] " + (str.matches(regexPattern) ? "matches" : "doesn't match") + " with pattern[" + regexPattern + "].");
         }
 
 
@@ -28,8 +28,8 @@ public class Test {
         testStrings.add("garden96+123@gmail.com");
         testStrings.add("nathan.ahn@");
 
-        for( String str : testStrings ) {
-            System.out.println("["+ str +"] "+ (str.matches(regexPattern)? "matches":"doesn't match") + " with pattern["+ regexPattern +"].");
+        for (String str : testStrings) {
+            System.out.println("[" + str + "] " + (str.matches(regexPattern) ? "matches" : "doesn't match") + " with pattern[" + regexPattern + "].");
         }
 
     }
