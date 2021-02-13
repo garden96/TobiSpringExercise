@@ -3,10 +3,12 @@ package springbook;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import javax.sql.DataSource;
 import com.mysql.jdbc.Driver;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ImportResource("/test-applicationContext.xml")
@@ -22,4 +24,10 @@ public class TestApplicationContext {
         return dataSource;
     }
 
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        DataSourceTransactionManager tm = new DataSourceTransactionManager();
+        tm.setDataSource(dataSource());
+        return tm;
+    }
 }
