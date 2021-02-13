@@ -34,18 +34,4 @@
     <!-- aop -->
     <tx:annotation-driven />
 
-    <!--  application components -->
-    <bean id="userDao" class="springbook.user.dao.UserDaoJdbc">
-        <property name="dataSource" ref="dataSource" />
-        <property name="sqlService" ref="sqlService" />
-    </bean>
-
-    <bean id="userService" class="springbook.user.service.UserServiceImpl">
-        <property name="userDao" ref="userDao" />
-        <property name="mailSender" ref="mailSender" />
-    </bean>
-
-    <bean id="testUserService" class="springbook.user.service.UserServiceTest$TestUserService" parent="userService" />
-
-    <bean id="mailSender" class="springbook.user.service.DummyMailSender" />
 </beans>
