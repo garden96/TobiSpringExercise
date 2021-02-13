@@ -29,7 +29,6 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 
 @Configuration
 @EnableTransactionManagement
-@ImportResource("/test-applicationContext.xml")
 public class TestApplicationContext {
 
     /**
