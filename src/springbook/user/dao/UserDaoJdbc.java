@@ -15,6 +15,8 @@ import springbook.user.domain.User;
 import springbook.user.sqlservice.SqlService;
 
 public class UserDaoJdbc implements UserDao {
+
+    @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

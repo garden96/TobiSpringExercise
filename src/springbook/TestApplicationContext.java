@@ -55,7 +55,6 @@ public class TestApplicationContext {
     @Bean
     public UserDao userDao() {
         UserDaoJdbc dao = new UserDaoJdbc();
-        dao.setDataSource(dataSource());
         return dao;
     }
 
