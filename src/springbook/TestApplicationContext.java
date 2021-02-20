@@ -57,13 +57,6 @@ public class TestApplicationContext {
     @Autowired
     UserDao userDao;
 
-    @Bean
-    public UserService userService() {
-        UserServiceImpl service = new UserServiceImpl();
-        service.setUserDao(this.userDao);
-        service.setMailSender(mailSender());
-        return service;
-    }
 
     @Bean
     public UserService testUserService() {
