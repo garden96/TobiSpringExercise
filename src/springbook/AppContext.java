@@ -28,7 +28,7 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 
 @Configuration
 @ComponentScan(basePackages="springbook.user")
-public class TestApplicationContext {
+public class AppContext {
 
     /**
      * DB related Bean configuration
