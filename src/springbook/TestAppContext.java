@@ -12,14 +12,10 @@ import springbook.user.service.UserServiceTest.TestUserService;
 @Configuration
 public class TestAppContext {
 
-    @Autowired
-    UserDao userDao;
 
     @Bean
     public UserService testUserService() {
         TestUserService testService = new TestUserService();
-        testService.setUserDao(this.userDao);
-        testService.setMailSender(mainSender());
         return testService;
     }
 
