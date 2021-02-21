@@ -25,7 +25,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestAppContext.class, AppContext.class, SqlServiceContext.class})
+@ContextConfiguration(classes = {TestAppContext.class, AppContext.class})
 public class UserDaoTest {
 
     @Autowired
