@@ -12,8 +12,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan(basePackages="springbook.user")
-@Import(SqlServiceContext.class)
+@ComponentScan(basePackages = "springbook.user")
+@Import({SqlServiceContext.class, TestAppContext.class, ProductionAppContext.class})
 public class AppContext {
 
     /**
