@@ -1,8 +1,8 @@
 package springbook;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
@@ -13,6 +13,7 @@ import springbook.user.service.UserService;
 import springbook.user.service.UserServiceTest;
 
 import javax.sql.DataSource;
+import java.sql.Driver;
 
 @Configuration
 @ComponentScan(basePackages = "springbook.user")
@@ -20,8 +21,15 @@ import javax.sql.DataSource;
 @PropertySource("/database.properties")
 public class AppContext {
 
-    @Autowired
-    Environment env;
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Value("${db.driverClass}") Class<? extends Driver> driverClass;
+    @Value("${db.url}") String url;
+    @Value("${db.username}") String username;
+    @Value("${db.password}") String password;
 
     /**
      * DB related Bean configuration
@@ -30,14 +38,10 @@ public class AppContext {
     public DataSource dataSource() {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
-        try {
-            dataSource.setDriverClass((Class<? extends java.sql.Driver>) Class.forName(env.getProperty("db.driverClass")));
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        dataSource.setUrl(env.getProperty("db.url"));
-        dataSource.setUsername(env.getProperty("db.username"));
-        dataSource.setPassword(env.getProperty("db.password"));
+        dataSource.setDriverClass(this.driverClass);
+        dataSource.setUrl(this.url);
+        dataSource.setUsername(this.username);
+        dataSource.setPassword(this.password);
 
         return dataSource;
     }
