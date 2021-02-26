@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan(basePackages = "springbook.user")
-@Import({SqlServiceContext.class, AppContext.TestAppContext.class, AppContext.ProductionAppContext.class})
+@Import(SqlServiceContext.class)
 public class AppContext {
 
     /**
