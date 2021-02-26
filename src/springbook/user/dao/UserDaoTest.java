@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,6 +28,16 @@ import static org.junit.Assert.assertThat;
 @ActiveProfiles("test")
 @ContextConfiguration(classes = AppContext.class)
 public class UserDaoTest {
+
+    @Autowired
+    DefaultListableBeanFactory beanFactory;
+
+    @Test
+    public void beans() {
+        for(String n : beanFactory.getBeanDefinitionNames()) {
+            System.out.println(n + " \t " + beanFactory.getBean(n).getClass().getName());
+        }
+    }
 
     @Autowired
     UserDao dao;
