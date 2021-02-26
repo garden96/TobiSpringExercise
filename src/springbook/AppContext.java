@@ -1,7 +1,8 @@
 package springbook;
 
-import com.mysql.jdbc.Driver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
@@ -12,11 +13,23 @@ import springbook.user.service.UserService;
 import springbook.user.service.UserServiceTest;
 
 import javax.sql.DataSource;
+import java.sql.Driver;
 
 @Configuration
 @ComponentScan(basePackages = "springbook.user")
 @Import(SqlServiceContext.class)
+@PropertySource("/database.properties")
 public class AppContext {
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Value("${db.driverClass}") Class<? extends Driver> driverClass;
+    @Value("${db.url}") String url;
+    @Value("${db.username}") String username;
+    @Value("${db.password}") String password;
 
     /**
      * DB related Bean configuration
@@ -24,10 +37,12 @@ public class AppContext {
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-        dataSource.setDriverClass(Driver.class);
-        dataSource.setUrl("jdbc:mysql://localhost/springbook?characterEncoding=UTF-8");
-        dataSource.setUsername("spring");
-        dataSource.setPassword("book");
+
+        dataSource.setDriverClass(this.driverClass);
+        dataSource.setUrl(this.url);
+        dataSource.setUsername(this.username);
+        dataSource.setPassword(this.password);
+
         return dataSource;
     }
 
