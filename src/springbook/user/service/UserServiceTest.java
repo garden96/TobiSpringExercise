@@ -5,19 +5,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import springbook.AppContext;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -27,47 +27,53 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static springbook.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml")
-@Transactional
-@TransactionConfiguration(defaultRollback = false)      // 롤백 여부에 대한 기본 설정과 트랜잭션메니저 빈을 지정하는데 사용
-                                                        // 디폴트 트랜잭션 메니저 아이디는 관례를 따라 transactionManager.
+@ActiveProfiles("test")
+@ContextConfiguration(classes = AppContext.class)
 public class UserServiceTest {
 
-    @Autowired 	UserService userService;
-    @Autowired 	UserService testUserService;    // 같은 타입의 빈이 두개 존재하므로 필드 이름을 기준으로 주입되는 빈이 결정.
-                                                // 자동 프록시 생성기에의해 프랜잭션 부가기능이 testUserService 빈에 적용됐는지 확인는 것이 목적임.
-    @Autowired  UserDao userDao;
-    @Autowired  MailSender mailSender;
-    @Autowired  PlatformTransactionManager transactionManager;
-    @Autowired  ApplicationContext context;
+    @Autowired
+    DefaultListableBeanFactory beanFactory;
 
-    List<User> users;   // test fixture
+    @Test
+    public void beans() {
+        for(String n : beanFactory.getBeanDefinitionNames()) {
+            System.out.println(n + " \t " + beanFactory.getBean(n).getClass().getName());
+        }
+    }
+
+    @Autowired
+    UserService userService;
+    @Autowired
+    UserService testUserService;
+    @Autowired
+    UserDao userDao;
+    @Autowired
+    MailSender mailSender;
+    @Autowired
+    PlatformTransactionManager transactionManager;
+    @Autowired
+    ApplicationContext context;
+
+
+    List<User> users;    // test fixture
 
     @Before
     public void setUp() {
         users = Arrays.asList(
-                new User("nathan", "안정원", "p1", "nathan@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
+                new User("nathan", "안정원", "p1", "nathan@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
                 new User("sunny", "현선", "p2", "sunny@sunnygarden.net", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-                new User("jane", "안재인", "p3", "jane@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
+                new User("jane", "안재인", "p3", "jane@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD - 1),
                 new User("junu", "안준우", "p4", "junu@sunnygarden.net", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD),
                 new User("nayoon", "현나윤", "p5", "nayoon@sunnygarden.net", Level.GOLD, 100, Integer.MAX_VALUE)
         );
-    }
-
-    @Test
-    /**
-     * 빈등록 설정이 잘 되어 빈이 생성되는지 확인
-     */
-    public void bean() {
-        assertThat(this.userService, is(notNullValue()));
     }
 
     @Test
@@ -96,49 +102,6 @@ public class UserServiceTest {
     private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
         assertThat(updated.getId(), is(expectedId));
         assertThat(updated.getLevel(), is(expectedLevel));
-    }
-
-
-    static class MockUserDao implements UserDao {
-        private List<User> users;
-        private List<User> updated = new ArrayList();
-
-        private MockUserDao(List<User> users) {
-            this.users = users;
-        }
-
-        public List<User> getUpdated() {
-            return this.updated;
-        }
-
-        public List<User> getAll() {
-            return this.users;
-        }
-
-        public void update(User user) {
-            updated.add(user);
-        }
-
-        public void add(User user) { throw new UnsupportedOperationException(); }
-        public void deleteAll() { throw new UnsupportedOperationException(); }
-        public User get(String id) { throw new UnsupportedOperationException(); }
-        public int getCount() { throw new UnsupportedOperationException(); }
-    }
-
-
-    static class MockMailSender implements MailSender {
-        private List<String> requests = new ArrayList<String>();
-
-        public List<String> getRequests() {
-            return requests;
-        }
-
-        public void send(SimpleMailMessage mailMessage) throws MailException {
-            requests.add(mailMessage.getTo()[0]);
-        }
-
-        public void send(SimpleMailMessage[] mailMessage) throws MailException {
-        }
     }
 
     @Test
@@ -172,8 +135,7 @@ public class UserServiceTest {
         User userUpdate = userDao.get(user.getId());
         if (upgraded) {
             assertThat(userUpdate.getLevel(), is(user.getLevel().nextLevel()));
-        }
-        else {
+        } else {
             assertThat(userUpdate.getLevel(), is(user.getLevel()));
         }
     }
@@ -198,37 +160,84 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-
         userDao.deleteAll();
         for (User user : users) userDao.add(user);
 
         try {
             testUserService.upgradeLevels();
             fail("TestUserServiceException expected");
-        }
-        catch (TestUserServiceException e) {
+        } catch (TestUserServiceException e) {
         }
 
         checkLevelUpgraded(users.get(1), false);
     }
 
-
-    @Test(expected = TransientDataAccessResourceException.class) // 예외가 리턴되면 테스트 성공
+    @Test(expected = TransientDataAccessResourceException.class)
     public void readOnlyTransactionAttribute() {
         testUserService.getAll();
     }
 
     @Test
-    @Rollback           // 메소드에서 디폴트 설정과 그 밖의 롤백 방법으로 재설정 가능.
+    @Transactional(propagation = Propagation.NEVER)
     public void transactionSync() {
-
-            userService.deleteAll();
-
-            userService.add(users.get(0));
-            userService.add(users.get(1));
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
     }
 
-    static class TestUserService extends UserServiceImpl {
+    static class MockUserDao implements UserDao {
+        private List<User> users;
+        private List<User> updated = new ArrayList<User>();
+
+        private MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+        public List<User> getUpdated() {
+            return this.updated;
+        }
+
+        public List<User> getAll() {
+            return this.users;
+        }
+
+        public void update(User user) {
+            updated.add(user);
+        }
+
+        public void add(User user) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void deleteAll() {
+            throw new UnsupportedOperationException();
+        }
+
+        public User get(String id) {
+            throw new UnsupportedOperationException();
+        }
+
+        public int getCount() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    static class MockMailSender implements MailSender {
+        private List<String> requests = new ArrayList<String>();
+
+        public List<String> getRequests() {
+            return requests;
+        }
+
+        public void send(SimpleMailMessage mailMessage) throws MailException {
+            requests.add(mailMessage.getTo()[0]);
+        }
+
+        public void send(SimpleMailMessage[] mailMessage) throws MailException {
+        }
+    }
+
+    public static class TestUserService extends UserServiceImpl {
         private String id = "junu"; // users(3).getId()
 
         protected void upgradeLevel(User user) {
@@ -236,9 +245,9 @@ public class UserServiceTest {
             super.upgradeLevel(user);
         }
 
-        public List<User> getAll() {        // get~ 으로 시작하는 method 이므로 readOlny transaction 대상임.
+        public List<User> getAll() {
             for (User user : super.getAll()) {
-                super.update(user);         // readOnly transaction 대상 method에 강제 쓰기 시도 하므로 예외 발생해야함.
+                super.update(user);
             }
             return null;
         }

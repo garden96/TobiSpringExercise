@@ -1,18 +1,24 @@
 package springbook.user.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 import java.util.List;
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
+    @Autowired
     private UserDao userDao;
+
+    @Autowired
     private MailSender mailSender;
 
     public void setUserDao(UserDao userDao) {
@@ -23,10 +29,8 @@ public class UserServiceImpl implements UserService {
         this.mailSender = mailSender;
     }
 
-
     public void upgradeLevels() {
         List<User> users = userDao.getAll();
-
         for (User user : users) {
             if (canUpgradeLevel(user)) {
                 upgradeLevel(user);
@@ -36,7 +40,6 @@ public class UserServiceImpl implements UserService {
 
     private boolean canUpgradeLevel(User user) {
         Level currentLevel = user.getLevel();
-
         switch (currentLevel) {
             case BASIC:
                 return (user.getLogin() >= MIN_LOGCOUNT_FOR_SILVER);
@@ -56,12 +59,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendUpgradeEMail(User user) {
-
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
-        mailMessage.setFrom("admin@sunnygarden.net");
+        mailMessage.setFrom("useradmin@ksug.org");
         mailMessage.setSubject("Upgrade 안내");
-        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+        mailMessage.setText("사용자님의 등급이" + user.getLevel().name());
 
         this.mailSender.send(mailMessage);
     }
@@ -70,6 +72,7 @@ public class UserServiceImpl implements UserService {
         if (user.getLevel() == null) user.setLevel(Level.BASIC);
         userDao.add(user);
     }
+
 
     public void deleteAll() {
         userDao.deleteAll();
@@ -86,5 +89,6 @@ public class UserServiceImpl implements UserService {
     public void update(User user) {
         userDao.update(user);
     }
+
 }
 

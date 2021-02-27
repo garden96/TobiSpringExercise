@@ -8,13 +8,15 @@ import java.util.List;
 @Transactional
 public interface UserService {
     void add(User user);
+
     void deleteAll();
+
     void update(User user);
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     User get(String id);
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     List<User> getAll();
 
     void upgradeLevels();
