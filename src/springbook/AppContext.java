@@ -3,11 +3,14 @@ package springbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
+import springbook.user.dao.UserDao;
 import springbook.user.service.DummyMailSender;
 import springbook.user.service.UserService;
 import springbook.user.service.UserServiceTest;
@@ -19,11 +22,11 @@ import java.sql.Driver;
 @ComponentScan(basePackages = "springbook.user")
 @Import(SqlServiceContext.class)
 @PropertySource("/database.properties")
-public class AppContext {
+public class AppContext implements SqlMapConfig {
 
-    @Bean
-    public SqlMapConfig sqlMapConfig() {
-        return new UserSqlMapConfig();
+    @Override
+    public Resource getSqlMapResource() {
+        return new ClassPathResource("sqlmap.xml", UserDao.class);
     }
 
     @Bean
@@ -57,6 +60,7 @@ public class AppContext {
         tm.setDataSource(dataSource());
         return tm;
     }
+
 
 
     @Configuration
